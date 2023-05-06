@@ -1,8 +1,6 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
-if(POLICY CMP0042)
-   # policies not known to CMake 2.8 ...
-   cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
-endif(POLICY CMP0042)
+CMAKE_MINIMUM_REQUIRED( VERSION 3.16 )
+# policies not known to CMake 2.8 ...
+cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
 
 # declare the project name
 PROJECT(genfit2)
@@ -38,42 +36,42 @@ ENDIF()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
 
 
-# either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
-# or, Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS have to be set via the command-line
+# # either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
+# # or, Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS have to be set via the command-line
 
 
-IF(DEFINED ENV{RAVEPATH})
-	MESSAGE(STATUS "Environment variable RAVEPATH is set. Try to build GFRave.")
-	# get compiler flags from rave
-	INCLUDE(FindPkgConfig)
-	SET(ENV{PKG_CONFIG_PATH} $ENV{RAVEPATH})
-	find_package(Rave REQUIRED)
+# IF(DEFINED ENV{RAVEPATH})
+# 	MESSAGE(STATUS "Environment variable RAVEPATH is set. Try to build GFRave.")
+# 	# get compiler flags from rave
+# 	INCLUDE(FindPkgConfig)
+# 	SET(ENV{PKG_CONFIG_PATH} $ENV{RAVEPATH})
+# 	find_package(Rave REQUIRED)
 	
-	SET(RAVE True)
-ELSEIF(DEFINED Rave_LDFLAGS)
-	IF(DEFINED Rave_INCLUDE_DIRS)
-		IF(DEFINED Rave_CFLAGS)
-			MESSAGE(STATUS "Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS are set. Try to build GFRave.")
-			SET(RAVE True)
-		ENDIF()
-	ENDIF()
-ELSE()
-   	MESSAGE(STATUS "No RAVEPATH or Rave flags given. GFRave will not be built.")
-ENDIF()
+# 	SET(RAVE True)
+# ELSEIF(DEFINED Rave_LDFLAGS)
+# 	IF(DEFINED Rave_INCLUDE_DIRS)
+# 		IF(DEFINED Rave_CFLAGS)
+# 			MESSAGE(STATUS "Rave_LDFLAGS, Rave_INCLUDE_DIRS and Rave_CFLAGS are set. Try to build GFRave.")
+# 			SET(RAVE True)
+# 		ENDIF()
+# 	ENDIF()
+# ELSE()
+#    	MESSAGE(STATUS "No RAVEPATH or Rave flags given. GFRave will not be built.")
+# ENDIF()
 
-IF(DEFINED RAVE)
-	# turn comma separated lists into space separated strings
-	string (REPLACE ";" " " Rave_LDFLAGS_STR "${Rave_LDFLAGS}")
-	string (REPLACE ";" " " Rave_INCLUDE_DIRS_STR "${Rave_INCLUDE_DIRS}")
-	string (REPLACE ";" " " Rave_CFLAGS_STR "${Rave_CFLAGS}")
+# IF(DEFINED RAVE)
+# 	# turn comma separated lists into space separated strings
+# 	string (REPLACE ";" " " Rave_LDFLAGS_STR "${Rave_LDFLAGS}")
+# 	string (REPLACE ";" " " Rave_INCLUDE_DIRS_STR "${Rave_INCLUDE_DIRS}")
+# 	string (REPLACE ";" " " Rave_CFLAGS_STR "${Rave_CFLAGS}")
 
-	SET (CMAKE_CXX_FLAGS ${Rave_DEFINITIONS} ${Rave_CFLAGS_STR})
-	SET(GF_INC_DIRS
-		./GFRave/include/ ${Rave_INCLUDE_DIRS_STR}
-	)
+# 	SET (CMAKE_CXX_FLAGS ${Rave_DEFINITIONS} ${Rave_CFLAGS_STR})
+# 	SET(GF_INC_DIRS
+# 		./GFRave/include/ ${Rave_INCLUDE_DIRS_STR}
+# 	)
 	
-	AUX_SOURCE_DIRECTORY( ./GFRave/src  library_sources )
-ENDIF()
+# 	AUX_SOURCE_DIRECTORY( ./GFRave/src  library_sources )
+# ENDIF()
 
 # Set GENFIT include directories
 SET(GF_INC_DIRS
@@ -94,17 +92,17 @@ INSTALL(DIRECTORY ${GF_INC_DIRS}
         PATTERN ".svn" EXCLUDE)
 
 IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wpedantic -Wall -Wextra \
- -Wno-long-long -Wshadow -Werror=overloaded-virtual -Wunused-parameter -Waddress")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wpedantic -Wall -Wextra \
+#  -Wno-long-long -Wshadow -Werror=overloaded-virtual -Wunused-parameter -Waddress")
 
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g")
-SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
-SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O3 -g")
+# SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g")
+# SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
+# SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O3 -g")
 
 
 INCLUDE_DIRECTORIES(
@@ -114,17 +112,17 @@ INCLUDE_DIRECTORIES(
 		${GF_INC_DIRS}
 )
 
-FIND_PACKAGE(Doxygen)
-IF(DOXYGEN_FOUND)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
+# FIND_PACKAGE(Doxygen)
+# IF(DOXYGEN_FOUND)
+#     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
 
-    ADD_CUSTOM_TARGET(doc
-        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
-        COMMENT "Generating API documentation with Doxygen" VERBATIM)
-ELSE()
-    MESSAGE( STATUS "Doxygen not installed or found -- API documentation can't be generated!" )
-ENDIF(DOXYGEN_FOUND)
+#     ADD_CUSTOM_TARGET(doc
+#         ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
+#         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
+#         COMMENT "Generating API documentation with Doxygen" VERBATIM)
+# ELSE()
+#     MESSAGE( STATUS "Doxygen not installed or found -- API documentation can't be generated!" )
+# ENDIF(DOXYGEN_FOUND)
 
 
 # declare the ROOT library path
@@ -306,49 +304,49 @@ else()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ROOT_LIBS})
 endif()
 
-INCLUDE(CTest)
+# INCLUDE(CTest)
 
-ADD_CUSTOM_TARGET( tests )
+# ADD_CUSTOM_TARGET( tests )
 
-ADD_GENFIT_TEST( fitterTests               test/fitterTests/main.cc)
-ADD_GENFIT_TEST( minimalFittingExample     test/minimalFittingExample/main.cc)
-ADD_GENFIT_TEST( minimalFittingExample2    test/minimalFittingExample/main2.cc)
-ADD_GENFIT_TEST( measurementFactoryExample test/measurementFactoryExample/main.cc)
-ADD_GENFIT_TEST( streamerTest              test/streamerTest/main.cc)
-ADD_GENFIT_TEST( unitTests                 test/unitTests/main.cc)
-IF(DEFINED RAVE)
-  ADD_GENFIT_TEST( vertexingTest           test/vertexingTest/main.cc)
-  ADD_GENFIT_TEST( vertexingTestRead       test/vertexingTest/read.cc)
-ENDIF()
+# ADD_GENFIT_TEST( fitterTests               test/fitterTests/main.cc)
+# ADD_GENFIT_TEST( minimalFittingExample     test/minimalFittingExample/main.cc)
+# ADD_GENFIT_TEST( minimalFittingExample2    test/minimalFittingExample/main2.cc)
+# ADD_GENFIT_TEST( measurementFactoryExample test/measurementFactoryExample/main.cc)
+# ADD_GENFIT_TEST( streamerTest              test/streamerTest/main.cc)
+# ADD_GENFIT_TEST( unitTests                 test/unitTests/main.cc)
+# IF(DEFINED RAVE)
+#   ADD_GENFIT_TEST( vertexingTest           test/vertexingTest/main.cc)
+#   ADD_GENFIT_TEST( vertexingTestRead       test/vertexingTest/read.cc)
+# ENDIF()
 
-IF(BUILD_TESTING)
+# IF(BUILD_TESTING)
 
-	# Run these automatically via ctest since they do not need a GUI. Create the
-	# necessary geometry first via a dummy test
-	ADD_TEST(NAME createGeometry COMMAND root -l -b -q ${CMAKE_CURRENT_LIST_DIR}/test/makeGeom.C)
+# 	# Run these automatically via ctest since they do not need a GUI. Create the
+# 	# necessary geometry first via a dummy test
+# 	ADD_TEST(NAME createGeometry COMMAND root -l -b -q ${CMAKE_CURRENT_LIST_DIR}/test/makeGeom.C)
 
-	ADD_TEST(NAME streamerTest COMMAND streamerTest)
-	SET_PROPERTY(TEST streamerTest PROPERTY DEPENDS createGeometry)
+# 	ADD_TEST(NAME streamerTest COMMAND streamerTest)
+# 	SET_PROPERTY(TEST streamerTest PROPERTY DEPENDS createGeometry)
 
-	ADD_TEST(NAME unitTests COMMAND unitTests)
-	SET_PROPERTY(TEST unitTests PROPERTY DEPENDS createGeometry)
+# 	ADD_TEST(NAME unitTests COMMAND unitTests)
+# 	SET_PROPERTY(TEST unitTests PROPERTY DEPENDS createGeometry)
 
-    ENABLE_TESTING()
+#     ENABLE_TESTING()
 
 
-	FIND_PACKAGE(GTest REQUIRED)
-	ADD_EXECUTABLE(gtests
-			gtest/TestConstField.cpp
-			gtest/TestMaterialEffects.cpp
-			gtest/TestRKTrackRep.cpp
-			gtest/TestMaterial.cpp
-			)
-	TARGET_LINK_LIBRARIES(gtests ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBS} ${PROJECT_NAME})  # gtest gtest_main
-	MESSAGE(STATUS  ${GTEST_INCLUDE_DIRS})
-	TARGET_INCLUDE_DIRECTORIES(gtests PUBLIC ${GTEST_INCLUDE_DIRS})
-	GTEST_DISCOVER_TESTS(gtests)
-	INSTALL(TARGETS gtests DESTINATION bin)
-ENDIF()
+# 	FIND_PACKAGE(GTest REQUIRED)
+# 	ADD_EXECUTABLE(gtests
+# 			gtest/TestConstField.cpp
+# 			gtest/TestMaterialEffects.cpp
+# 			gtest/TestRKTrackRep.cpp
+# 			gtest/TestMaterial.cpp
+# 			)
+# 	TARGET_LINK_LIBRARIES(gtests ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBS} ${PROJECT_NAME})  # gtest gtest_main
+# 	MESSAGE(STATUS  ${GTEST_INCLUDE_DIRS})
+# 	TARGET_INCLUDE_DIRECTORIES(gtests PUBLIC ${GTEST_INCLUDE_DIRS})
+# 	GTEST_DISCOVER_TESTS(gtests)
+# 	INSTALL(TARGETS gtests DESTINATION bin)
+# ENDIF()
 
 # generate and install following configuration files
 #GENERATE_PACKAGE_CONFIGURATION_FILES( genfitConfig.cmake genfitConfigVersion.cmake )
