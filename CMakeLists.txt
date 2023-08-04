@@ -30,7 +30,7 @@ INCLUDE(macros)
 INCLUDE(genfit)
 
 FIND_PACKAGE(ROOT REQUIRED COMPONENTS Geom)
-IF(${ROOT_found_version} LESS 60000)
+IF(${ROOT_VERSION} VERSION_LESS 6.00.00)
 	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00")
 ENDIF()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
@@ -164,25 +164,27 @@ SET(CORE_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/finitePlanes/include/RectangularFinitePlane.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"CORE_DICTIONARY"
 		"${CORE_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/src/coreLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cc" "${library_sources}")
 
 SET(EVENTDISPLAY_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include/EventDisplay.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"EVENTDISPLAY_DICTIONARY"
 		"${EVENTDISPLAY_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/fitters/include;${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc" "${library_sources}")
 
 SET(FITTERS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/AbsKalmanFitter.h
@@ -195,13 +197,14 @@ SET(FITTERS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/DAF.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"FITTERS_DICTIONARY"
 		"${FITTERS_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/fitters/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/fitters/src/fittersLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cc" "${library_sources}")
 
 SET(GBL_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GFGbl.h
@@ -212,13 +215,14 @@ SET(GBL_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblData.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+        "GBL_DICTIONARY"
         "${GBL_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/GBL/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/GBL/src/GBLLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cc" "${library_sources}")
 
 SET(MEASUREMENTS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixPhi.h
@@ -236,26 +240,28 @@ SET(MEASUREMENTS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/WireTrackCandHit.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"MEASUREMENTS_DICTIONARY"
 		"${MEASUREMENTS_DICTIONARY_SOURCES}"
         "${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/measurements/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/measurements/src/measurementsLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cc" "${library_sources}")
 
 SET(TRACKREPS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/RKTrackRep.h
 		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/MplTrackRep.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"TRACKREPS_DICTIONARY"
 		"${TRACKREPS_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/trackReps/src/trackRepsLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cc" "${library_sources}")
 
 SET(UTILITIES_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/HelixTrackModel.h
@@ -264,13 +270,14 @@ SET(UTILITIES_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/mySpacepointMeasurement.h
 )
 ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+		"UTILITIES_DICTIONARY"
 		"${UTILITIES_DICTIONARY_SOURCES}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/utilities/include;${CMAKE_CURRENT_SOURCE_DIR}/measurements/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/utilities/src/utilitiesLinkDef.h"
 		"${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cc"
 )
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cc" "${library_sources}")
+# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cc" "${library_sources}")
 
 if(DEFINED RAVE)
 	SET(GFRAVE_DICTIONARY_SOURCES
@@ -278,13 +285,14 @@ if(DEFINED RAVE)
 			${CMAKE_CURRENT_SOURCE_DIR}/GFRave/include/GFRaveVertex.h
 	)
 	ROOT_GENERATE_DICTIONARY(
-			"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+			# "${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+			"GFRAVE_DICTIONARY"
 			"${GFRAVE_DICTIONARY_SOURCES}"
 			"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/GFRave/include"
 			"${CMAKE_CURRENT_SOURCE_DIR}/GFRave/src/GFRaveLinkDef.h"
 			"${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cc"
 	)
-	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cc" "${library_sources}")
+	# SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cc" "${library_sources}")
 endif()
 
 
