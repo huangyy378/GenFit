@@ -7,7 +7,7 @@
 #       ADD_EXECUTABLE( ${_testname} EXCLUDE_FROM_ALL ${ARGN} )
 #     ENDIF()
 #     ADD_DEPENDENCIES( tests  ${_testname} )
-#     TARGET_LINK_LIBRARIES( ${_testname} ${PROJECT_NAME}  ${ROOT_LIBS} -lGeom )
+#     TARGET_LINK_LIBRARIES( ${_testname} ${PROJECT_NAME}  ${ROOT_LIBRARIES} -lGeom )
 #     #INSTALL( TARGETS ${_testname} DESTINATION ${EXECUTABLE_INSTALL_DIR})
 # ENDMACRO( ADD_GENFIT_TEST )
 
