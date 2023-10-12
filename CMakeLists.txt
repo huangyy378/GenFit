@@ -12,6 +12,8 @@ SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
 include(GNUInstallDirs)
 
+option(GF_BUILD_EVENT_DISPLAY "Build event display module." ON)
+
 # install destinations can be passed via the command line:
 # cmake -DLIBRARY_OUTPUT_DIRECTORY:PATH=.... -DINCLUDE_OUTPUT_DIRECTORY:PATH=....
 # otherwise, set default install destinations
@@ -75,7 +77,6 @@ SET(CMAKE_CXX_STANDARD 20)
 # Set GENFIT include directories
 SET(GF_INC_DIRS
 		./core/include/
-		./eventDisplay/include/
 		./fields/include/
 		./finitePlanes/include/
 		./fitters/include/
@@ -85,6 +86,9 @@ SET(GF_INC_DIRS
 		./utilities/include/
 		${GF_INC_DIRS}
 )
+if(GF_BUILD_EVENT_DISPLAY)
+    list(APPEND GF_INC_DIRS ./eventDisplay/include/)
+endif()
 
 INSTALL(DIRECTORY ${GF_INC_DIRS}
         DESTINATION ${INCLUDE_OUTPUT_DIRECTORY}
@@ -130,7 +134,9 @@ LINK_DIRECTORIES(${ROOT_LIBRARY_DIR})
 
 # add the list of source code files -- careful, when a new file is added!
 AUX_SOURCE_DIRECTORY( ./core/src          library_sources )
-AUX_SOURCE_DIRECTORY( ./eventDisplay/src  library_sources )
+if(GF_BUILD_EVENT_DISPLAY)
+	AUX_SOURCE_DIRECTORY( ./eventDisplay/src  library_sources )
+endif()
 AUX_SOURCE_DIRECTORY( ./fields/src        library_sources )
 AUX_SOURCE_DIRECTORY( ./finitePlanes/src  library_sources )
 AUX_SOURCE_DIRECTORY( ./fitters/src       library_sources )
@@ -171,17 +177,19 @@ ROOT_GENERATE_DICTIONARY(
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cc" "${library_sources}")
 
-SET(EVENTDISPLAY_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include/EventDisplay.h
-)
-ROOT_GENERATE_DICTIONARY(
-		"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
-		"${EVENTDISPLAY_DICTIONARY_SOURCES}"
-		"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/fitters/include;${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h"
-		"${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc" "${library_sources}")
+if(GF_BUILD_EVENT_DISPLAY)
+	SET(EVENTDISPLAY_DICTIONARY_SOURCES
+			${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include/EventDisplay.h
+	)
+	ROOT_GENERATE_DICTIONARY(
+			"${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}"
+			"${EVENTDISPLAY_DICTIONARY_SOURCES}"
+			"${CMAKE_CURRENT_SOURCE_DIR}/core/include;${CMAKE_CURRENT_SOURCE_DIR}/fitters/include;${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include"
+			"${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h"
+			"${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc"
+	)
+	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cc" "${library_sources}")
+endif()
 
 SET(FITTERS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/AbsKalmanFitter.h
