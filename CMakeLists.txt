@@ -32,8 +32,8 @@ INCLUDE(macros)
 INCLUDE(genfit)
 
 FIND_PACKAGE(ROOT REQUIRED COMPONENTS Geom)
-IF(${ROOT_found_version} LESS 60000)
-	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.00.00")
+IF(${ROOT_version} VERSION_LESS 6.28.0)
+	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.28.0")
 ENDIF()
 SET(CMAKE_CXX_STANDARD 20)
 

@@ -18,8 +18,7 @@
 #   ROOT_${COMPONENT}_FOUND     : set to TRUE or FALSE for each library
 #   ROOT_${COMPONENT}_LIBRARY   : path to individual libraries
 #   ROOT_LIBS                : required ROOT libraries
-#   ROOT_found_version      : contains the version of ROOT in a comparable
-#                             way, i.e. 5.99.00 as 59900
+#   ROOT_version            : contains the version of ROOT
 #   ROOT_CXX_FLAGS          : the c++ compiler flags
 #
 #   Please note that by convention components should be entered exactly as
@@ -114,20 +113,12 @@ IF( ROOT_CONFIG_EXECUTABLE )
 
 
     # ==============================================
-    # ===         ROOT_found_version             ===
+    # ===         ROOT_version             ===
     # ==============================================
 
     EXECUTE_PROCESS( COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
-        OUTPUT_VARIABLE ROOT_VERSION
+        OUTPUT_VARIABLE ROOT_version
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    IF( _exit_code EQUAL 0 )
-        # Make ROOT-version easier to compare in cmake:
-        STRING(REGEX REPLACE "^([0-9]+)\\.[0-9][0-9]+\\/[0-9][0-9]+.*" "\\1" found_root_major_vers "${ROOT_VERSION}")
-        STRING(REGEX REPLACE "^[0-9]+\\.([0-9][0-9])+\\/[0-9][0-9]+.*" "\\1" found_root_minor_vers "${ROOT_VERSION}")
-        STRING(REGEX REPLACE "^[0-9]+\\.[0-9][0-9]+\\/([0-9][0-9]+).*" "\\1" found_root_patch_vers "${ROOT_VERSION}")
-        MATH(EXPR ROOT_found_version "${found_root_major_vers}*10000 + ${found_root_minor_vers}*100 + ${found_root_patch_vers}")
-    ENDIF()
-
 
     # ==============================================
     # ===          ROOT_EXECUTABLE               ===
