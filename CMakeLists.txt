@@ -274,6 +274,10 @@ endif()
 # install
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources})
 INSTALL(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+file(GLOB GenFit_PCM ${CMAKE_CURRENT_BINARY_DIR}/*.pcm)
+foreach(_pcm ${GenFit_PCM})
+    install(FILES ${_pcm} DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+endforeach()
 
 # link ROOT libraries
 if(GF_BUILD_EVENT_DISPLAY)
