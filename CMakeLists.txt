@@ -278,6 +278,10 @@ file(GLOB GenFit_PCM ${CMAKE_CURRENT_BINARY_DIR}/*.pcm)
 foreach(_pcm ${GenFit_PCM})
     install(FILES ${_pcm} DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 endforeach()
+file(GLOB GenFit_ROOTMAP ${CMAKE_CURRENT_BINARY_DIR}/*.rootmap)
+foreach(_rootmap ${GenFit_ROOTMAP})
+    install(FILES ${_rootmap} DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+endforeach()
 
 # link ROOT libraries
 if(GF_BUILD_EVENT_DISPLAY)
