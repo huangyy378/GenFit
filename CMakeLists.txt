@@ -281,9 +281,9 @@ endforeach()
 
 # link ROOT libraries
 if(GF_BUILD_EVENT_DISPLAY)
-	set(GF_LINK_ROOT_LIBRARIES ROOT::Core ROOT::Physics ROOT::Eve)
+	set(GF_LINK_ROOT_LIBRARIES ROOT::Core ROOT::Physics ROOT::EG ROOT::Eve)
 else()
-	set(GF_LINK_ROOT_LIBRARIES ROOT::Core ROOT::Physics)
+	set(GF_LINK_ROOT_LIBRARIES ROOT::Core ROOT::Physics ROOT::EG)
 endif()
 if(DEFINED RAVE)
 	TARGET_LINK_LIBRARIES(
