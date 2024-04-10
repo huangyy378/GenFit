@@ -166,6 +166,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/core/src/coreLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcoreRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcoreRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 if(GF_BUILD_EVENT_DISPLAY)
 	SET(EVENTDISPLAY_DICTIONARY_SOURCES
@@ -177,6 +179,8 @@ if(GF_BUILD_EVENT_DISPLAY)
 			LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h"
 	)
 	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cxx" "${library_sources}")
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libeventDisplayRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libeventDisplayRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
 SET(FITTERS_DICTIONARY_SOURCES
@@ -195,6 +199,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/fitters/src/fittersLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libfittersRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libfittersRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(GBL_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GFGbl.h
@@ -210,6 +216,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/GBL/src/GBLLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGBLRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGBLRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(MEASUREMENTS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixPhi.h
@@ -232,6 +240,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/measurements/src/measurementsLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmeasurementsRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmeasurementsRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(TRACKREPS_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/RKTrackRep.h
@@ -243,6 +253,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/trackReps/src/trackRepsLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libtrackRepsRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libtrackRepsRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(UTILITIES_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/HelixTrackModel.h
@@ -256,6 +268,8 @@ ROOT_GENERATE_DICTIONARY(
 		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/utilities/src/utilitiesLinkDef.h"
 )
 SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cxx" "${library_sources}")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libutilitiesRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libutilitiesRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 if(DEFINED RAVE)
 	SET(GFRAVE_DICTIONARY_SOURCES
@@ -268,20 +282,14 @@ if(DEFINED RAVE)
 			LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/GFRave/src/GFRaveLinkDef.h"
 	)
 	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cxx" "${library_sources}")
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGFRaveRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGFRaveRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
 
 # install
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources})
 INSTALL(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
-file(GLOB GenFit_PCM ${CMAKE_CURRENT_BINARY_DIR}/*.pcm)
-foreach(_pcm ${GenFit_PCM})
-    install(FILES ${_pcm} DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
-endforeach()
-file(GLOB GenFit_ROOTMAP ${CMAKE_CURRENT_BINARY_DIR}/*.rootmap)
-foreach(_rootmap ${GenFit_ROOTMAP})
-    install(FILES ${_rootmap} DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
-endforeach()
 
 # link ROOT libraries
 if(GF_BUILD_EVENT_DISPLAY)
