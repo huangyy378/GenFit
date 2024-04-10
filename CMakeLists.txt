@@ -139,149 +139,133 @@ AUX_SOURCE_DIRECTORY( ./utilities/src     library_sources )
 
 # Dictionary generation.  For the time being, we list classes one-by-one.
 SET(CORE_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsFinitePlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsFitterInfo.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsHMatrix.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsTrackRep.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/DetPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/FitStatus.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/IO.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/Material.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/MeasuredStateOnPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/MeasurementFactory.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/MeasurementOnPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/MeasurementProducer.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/StateOnPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/ThinScatterer.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/Track.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackCand.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackCandHit.h
-		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackPoint.h
-		${CMAKE_CURRENT_SOURCE_DIR}/finitePlanes/include/RectangularFinitePlane.h
-)
+	AbsFinitePlane.h
+	AbsFitterInfo.h
+	AbsHMatrix.h
+	AbsTrackRep.h
+	DetPlane.h
+	FitStatus.h
+	IO.h
+	Material.h
+	MeasuredStateOnPlane.h
+	MeasurementFactory.h
+	MeasurementOnPlane.h
+	MeasurementProducer.h
+	StateOnPlane.h
+	AbsMeasurement.h
+	ThinScatterer.h
+	Track.h
+	TrackCand.h
+	TrackCandHit.h
+	TrackPoint.h
+	RectangularFinitePlane.h)
 ROOT_GENERATE_DICTIONARY(
-	    coreRootDict
-		"${CORE_DICTIONARY_SOURCES}"
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/core/src/coreLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cxx" "${library_sources}")
+	coreRootDict
+	${CORE_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/core/src/coreLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/coreRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcoreRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcoreRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 if(GF_BUILD_EVENT_DISPLAY)
 	SET(EVENTDISPLAY_DICTIONARY_SOURCES
-			${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/include/EventDisplay.h
-	)
+		EventDisplay.h)
 	ROOT_GENERATE_DICTIONARY(
-		    eventDisplayRootDict
-			"${EVENTDISPLAY_DICTIONARY_SOURCES}"
-			LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h"
-	)
-	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cxx" "${library_sources}")
+		eventDisplayRootDict
+		${EVENTDISPLAY_DICTIONARY_SOURCES}
+		LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/eventDisplay/src/eventDisplayLinkDef.h)
+	SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/eventDisplayRootDict.cxx ${library_sources})
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libeventDisplayRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libeventDisplayRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
 SET(FITTERS_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/AbsKalmanFitter.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/KalmanFittedStateOnPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/KalmanFitStatus.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/ReferenceStateOnPlane.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/KalmanFitterRefTrack.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/KalmanFitter.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/KalmanFitterInfo.h
-		${CMAKE_CURRENT_SOURCE_DIR}/fitters/include/DAF.h
-)
+	AbsKalmanFitter.h
+	KalmanFittedStateOnPlane.h
+	KalmanFitStatus.h
+	ReferenceStateOnPlane.h
+	KalmanFitterRefTrack.h
+	KalmanFitter.h
+	KalmanFitterInfo.h
+	DAF.h)
 ROOT_GENERATE_DICTIONARY(
-	    fittersRootDict
-		"${FITTERS_DICTIONARY_SOURCES}"
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/fitters/src/fittersLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cxx" "${library_sources}")
+	fittersRootDict
+	${FITTERS_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/fitters/src/fittersLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libfittersRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libfittersRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(GBL_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GFGbl.h
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitter.h
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/ICalibrationParametersDerivatives.h
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitterInfo.h
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitStatus.h
-		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblData.h
-)
+	GFGbl.h
+	GblFitter.h
+	ICalibrationParametersDerivatives.h
+	GblFitterInfo.h
+	GblFitStatus.h
+	GblData.h)
 ROOT_GENERATE_DICTIONARY(
-	    GBLRootDict
-        "${GBL_DICTIONARY_SOURCES}"
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/GBL/src/GBLLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cxx" "${library_sources}")
+	GBLRootDict
+    ${GBL_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/GBL/src/GBLLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/GBLRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGBLRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGBLRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(MEASUREMENTS_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixPhi.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixU.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixUnit.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixV.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/HMatrixUV.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/FullMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/PlanarMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/ProlateSpacepointMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/SpacepointMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/WireMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/WireMeasurementNew.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/WirePointMeasurement.h
-		${CMAKE_CURRENT_SOURCE_DIR}/measurements/include/WireTrackCandHit.h
-)
+	HMatrixPhi.h
+	HMatrixU.h
+	HMatrixUnit.h
+	HMatrixV.h
+	HMatrixUV.h
+	FullMeasurement.h
+	PlanarMeasurement.h
+	ProlateSpacepointMeasurement.h
+	SpacepointMeasurement.h
+	WireMeasurement.h
+	WireMeasurementNew.h
+	WirePointMeasurement.h
+	WireTrackCandHit.h)
 ROOT_GENERATE_DICTIONARY(
-		measurementsRootDict
-		${MEASUREMENTS_DICTIONARY_SOURCES}
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/measurements/src/measurementsLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cxx" "${library_sources}")
+	measurementsRootDict
+	${MEASUREMENTS_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/measurements/src/measurementsLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/measurementsRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmeasurementsRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmeasurementsRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(TRACKREPS_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/RKTrackRep.h
-		${CMAKE_CURRENT_SOURCE_DIR}/trackReps/include/MplTrackRep.h
-)
+	RKTrackRep.h
+	MplTrackRep.h)
 ROOT_GENERATE_DICTIONARY(
-	    trackRepsRootDict
-		"${TRACKREPS_DICTIONARY_SOURCES}"
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/trackReps/src/trackRepsLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cxx" "${library_sources}")
+	trackRepsRootDict
+	${TRACKREPS_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/trackReps/src/trackRepsLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/trackRepsRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libtrackRepsRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libtrackRepsRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 SET(UTILITIES_DICTIONARY_SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/HelixTrackModel.h
-		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/MeasurementCreator.h
-		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/mySpacepointDetectorHit.h
-		${CMAKE_CURRENT_SOURCE_DIR}/utilities/include/mySpacepointMeasurement.h
-)
+	HelixTrackModel.h
+	MeasurementCreator.h
+	mySpacepointDetectorHit.h
+	mySpacepointMeasurement.h)
 ROOT_GENERATE_DICTIONARY(
-	    utilitiesRootDict
-		"${UTILITIES_DICTIONARY_SOURCES}"
-		LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/utilities/src/utilitiesLinkDef.h"
-)
-SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cxx" "${library_sources}")
+	utilitiesRootDict
+	${UTILITIES_DICTIONARY_SOURCES}
+	LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/utilities/src/utilitiesLinkDef.h)
+SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/utilitiesRootDict.cxx ${library_sources})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libutilitiesRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libutilitiesRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 
 if(DEFINED RAVE)
 	SET(GFRAVE_DICTIONARY_SOURCES
-			${CMAKE_CURRENT_SOURCE_DIR}/GFRave/include/GFRaveTrackParameters.h
-			${CMAKE_CURRENT_SOURCE_DIR}/GFRave/include/GFRaveVertex.h
-	)
+		GFRaveTrackParameters.h
+		GFRaveVertex.h)
 	ROOT_GENERATE_DICTIONARY(
-		    GFRaveRootDict
-			"${GFRAVE_DICTIONARY_SOURCES}"
-			LINKDEF "${CMAKE_CURRENT_SOURCE_DIR}/GFRave/src/GFRaveLinkDef.h"
-	)
-	SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cxx" "${library_sources}")
+		GFRaveRootDict
+		${GFRAVE_DICTIONARY_SOURCES}
+		LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/GFRave/src/GFRaveLinkDef.h)
+	SET(library_sources ${CMAKE_CURRENT_BINARY_DIR}/GFRaveRootDict.cxx ${library_sources})
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGFRaveRootDict_rdict.pcm DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libGFRaveRootDict.rootmap DESTINATION ${LIBRARY_OUTPUT_DIRECTORY})
 endif()
