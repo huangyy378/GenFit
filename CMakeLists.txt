@@ -210,6 +210,7 @@ SET(MEASUREMENTS_DICTIONARY_SOURCES
 	PlanarMeasurement.h
 	ProlateSpacepointMeasurement.h
 	SpacepointMeasurement.h
+	HelixMeasurement.h
 	WireMeasurement.h
 	WireMeasurementNew.h
 	WirePointMeasurement.h
