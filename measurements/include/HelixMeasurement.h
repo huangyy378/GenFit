@@ -57,31 +57,12 @@ public:
 
     virtual SharedPlanePtr constructPlane(const StateOnPlane& state) const override;
 
-    /**  Hits with a small drift distance get a higher weight, whereas hits with
-     * big drift distances become weighted down.
-     * When these initial weights are used by the DAF, the smoothed track will be closer to the real
-     * trajectory than if both sides are weighted with 0.5 regardless of the drift distance.
-     * This helps a lot when resolving l/r ambiguities with the DAF.
-     * The idea is that for the first iteration of the DAF, the wire positions are taken.
-     * For small drift radii, the wire position does not bend the fit away from the
-     * trajectory, whereas the wire position for hits with large drift radii is further away
-     * from the trajectory and will therefore bias the fit if not weighted down.
-     */
     virtual std::vector<MeasurementOnPlane*> constructMeasurementsOnPlane(const StateOnPlane& state) const override;
 
     virtual const AbsHMatrix* constructHMatrix(const AbsTrackRep*) const override;
 
-    /** Set maximum drift distance. This is used to calculate the start weights of the two
-     * measurementsOnPlane.
-     */
     void setMaxDistance(double d) { maxDistance_ = d; }
 
-    /**
-     * select how to resolve the left/right ambiguity:
-     * -1: negative (left) side on vector (track direction) x (helix tangent)
-     * 0: auto select (take side with smallest distance to track)
-     * 1: positive (right) side on vector (track direction) x (helix tangent)
-     */
     void setLeftRightResolution(int lr);
 
     virtual bool isLeftRightMeasurement() const override { return true; }
