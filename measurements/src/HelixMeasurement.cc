@@ -20,7 +20,7 @@ HelixMeasurement::HelixMeasurement(int nDim) :
     AbsMeasurement(nDim),
     maxDistance_(2.0),
     leftRight_(0) {
-    assert(nDim == 7);
+    assert(nDim == 8);
 }
 
 HelixMeasurement::HelixMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov,
@@ -29,7 +29,7 @@ HelixMeasurement::HelixMeasurement(const TVectorD& rawHitCoords, const TMatrixDS
     maxDistance_(2.0),
     leftRight_(0) {
 
-    if (rawHitCoords_.GetNrows() != 7) {
+    if (rawHitCoords_.GetNrows() != 8) {
         throw Exception("HelixMeasurement requires 7-dimensional rawHitCoords", __LINE__, __FILE__);
     }
 }
@@ -66,9 +66,9 @@ SharedPlanePtr HelixMeasurement::constructPlane(const StateOnPlane& state) const
 
 std::vector<MeasurementOnPlane*> HelixMeasurement::constructMeasurementsOnPlane(
     const StateOnPlane& state) const {
-    double mR = rawHitCoords_(6);
+    double mR = rawHitCoords_(8);
     double mL = -mR;
-    double V = rawHitCov_(6, 6);
+    double V = rawHitCov_(7, 7);
 
     MeasurementOnPlane* mopL = new MeasurementOnPlane(
         TVectorD(1, &mL),
@@ -128,13 +128,15 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
     const TVector3 center(rawHitCoords_(0), rawHitCoords_(1), rawHitCoords_(2));
     const double radius = rawHitCoords_(3);
     const double pitch = rawHitCoords_(4);
-    const double phi0 = rawHitCoords_(5) + TMath::Pi();
+    const double phi0 = rawHitCoords_(5);
+    const double phiTotal = rawHitCoords_(6);
+    double phi1 = (phi0 + phiTotal) / 2;
     const TVector3 relPos = point - center;
     const double k = pitch / (2 * TMath::Pi());
 
     // construct functions
     auto distanceSq = [&](double phi) -> double {
-        const double deltaPhi = phi - phi0;
+        const double deltaPhi = phi - phi1;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
         const double z = k * phi;
@@ -145,7 +147,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
     };
 
     auto derivative = [&](double phi) -> double {
-        const double deltaPhi = phi - phi0;
+        const double deltaPhi = phi - phi1;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
         const double z = k * phi;
@@ -161,7 +163,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
 
     // second derivative
     auto secondDerivative = [&](double phi) -> double {
-        const double deltaPhi = phi - phi0;
+        const double deltaPhi = phi - phi1;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
 
@@ -182,8 +184,8 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
     const double zGuess = (std::abs(k) > 1e-9) ? relPos.Z() / k : 0.0;
 
     // find good starting point
-    const double startPhi = zGuess - TMath::Pi();
-    const double endPhi = zGuess + TMath::Pi();
+    const double startPhi = phi0;
+    const double endPhi = phi0 + phiTotal;
 
     for (int i = 0; i <= numSamples; ++i) {
         const double phi = startPhi + i * (endPhi - startPhi) / numSamples;
@@ -211,7 +213,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
         if (std::abs(delta) < tolerance) break;
     }
 
-    const double deltaPhi = phi - phi0;
+    const double deltaPhi = phi - phi1;
     const double normalizedPhi = deltaPhi - 2 * TMath::Pi() * std::floor(deltaPhi / (2 * TMath::Pi()));
 
     result.point.SetXYZ(

@@ -47,7 +47,7 @@ namespace genfit {
 class HelixMeasurement : public AbsMeasurement {
 
 public:
-    HelixMeasurement(int nDim = 7);
+    HelixMeasurement(int nDim = 8);
     HelixMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov,
                      int detId, int hitId, TrackPoint* trackPoint);
 
