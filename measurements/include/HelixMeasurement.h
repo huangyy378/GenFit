@@ -90,13 +90,13 @@ public:
     double getMaxDistance() { return maxDistance_; }
 
 protected:
-    double maxDistance_;    ///< Maximum drift distance for weight calculation
-    signed char leftRight_; ///< Left/right ambiguity resolution setting
+    double maxDistance_;
+    signed char leftRight_;
     struct ClosestPointResult {
-        TVector3 point;   ///< 螺旋线上最近点
-        TVector3 tangent; ///< 该点的切线方向
+        TVector3 point;   // closest point on the helix to the given point
+        TVector3 tangent; // tangent of the helix at the closest point
     };
-    ClosestPointResult findClosestPointOnHelix(const TVector3& point) const; // 添加了声明
+    ClosestPointResult findClosestPointOnHelix(const TVector3& point) const;
 
 public:
     ClassDefOverride(HelixMeasurement, 1);
