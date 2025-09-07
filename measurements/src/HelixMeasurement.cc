@@ -43,7 +43,7 @@ SharedPlanePtr HelixMeasurement::constructPlane(const StateOnPlane& state) const
     auto closest = findClosestPointOnHelix(currentPos);
     const TVector3& pocaOnHelix = closest.point;
     TVector3 tangent = closest.tangent;
-    tangent.SetMag(1.0); // 确保单位向量
+    tangent.SetMag(1.0);
 
     // get track direction
     TVector3 dirInPoca = rep->getMom(state);
@@ -128,7 +128,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
     const TVector3 center(rawHitCoords_(0), rawHitCoords_(1), rawHitCoords_(2));
     const double radius = rawHitCoords_(3);
     const double pitch = rawHitCoords_(4);
-    const double phi0 = rawHitCoords_(5);
+    const double phi0 = rawHitCoords_(5) + TMath::Pi();
     const TVector3 relPos = point - center;
     const double k = pitch / (2 * TMath::Pi());
 
@@ -137,7 +137,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
         const double deltaPhi = phi - phi0;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
-        const double z = k * phi; // 连续z坐标
+        const double z = k * phi;
 
         return (x - relPos.X()) * (x - relPos.X()) +
                (y - relPos.Y()) * (y - relPos.Y()) +
@@ -182,8 +182,8 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
     const double zGuess = (std::abs(k) > 1e-9) ? relPos.Z() / k : 0.0;
 
     // find good starting point
-    const double startPhi = zGuess - 5 * 2 * TMath::Pi();
-    const double endPhi = zGuess + 5 * 2 * TMath::Pi();
+    const double startPhi = zGuess - TMath::Pi();
+    const double endPhi = zGuess + TMath::Pi();
 
     for (int i = 0; i <= numSamples; ++i) {
         const double phi = startPhi + i * (endPhi - startPhi) / numSamples;
