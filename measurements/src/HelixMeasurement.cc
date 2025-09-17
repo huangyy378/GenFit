@@ -66,7 +66,7 @@ SharedPlanePtr HelixMeasurement::constructPlane(const StateOnPlane& state) const
 
 std::vector<MeasurementOnPlane*> HelixMeasurement::constructMeasurementsOnPlane(
     const StateOnPlane& state) const {
-    double mR = rawHitCoords_(8);
+    double mR = rawHitCoords_(7);
     double mL = -mR;
     double V = rawHitCov_(7, 7);
 
