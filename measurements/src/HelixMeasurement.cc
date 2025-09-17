@@ -139,7 +139,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
         const double deltaPhi = phi - phi1;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
-        const double z = k * phi;
+        const double z = k * deltaPhi;
 
         return (x - relPos.X()) * (x - relPos.X()) +
                (y - relPos.Y()) * (y - relPos.Y()) +
@@ -150,7 +150,7 @@ HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
         const double deltaPhi = phi - phi1;
         const double x = radius * std::cos(deltaPhi);
         const double y = radius * std::sin(deltaPhi);
-        const double z = k * phi;
+        const double z = k * deltaPhi;
 
         const double dx_dphi = -radius * std::sin(deltaPhi);
         const double dy_dphi = radius * std::cos(deltaPhi);
