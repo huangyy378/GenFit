@@ -4,232 +4,208 @@
 #include "DetPlane.h"
 #include "Exception.h"
 #include "HMatrixU.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
 #include "RKTrackRep.h"
 #include "StateOnPlane.h"
+
 #include "TMath.h"
 
+#include <TClass.h>
 #include <cassert>
 #include <cmath>
+#include <gsl/gsl_multimin.h>
+#include <gsl/gsl_vector.h>
 #include <stdexcept>
-#include <TClass.h>
 #include <vector>
+
+// ClassImp(genfit::HelixMeasurement)
 
 namespace genfit {
 
-HelixMeasurement::HelixMeasurement(int nDim) :
-    AbsMeasurement(nDim),
-    maxDistance_(2.0),
-    leftRight_(0) {
-    assert(nDim == 8);
+HelixMeasurement::HelixMeasurement(int nDim) : AbsMeasurement(nDim) {
+  assert(nDim == 8); // 8维
 }
 
-HelixMeasurement::HelixMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov,
-                                   int detId, int hitId, TrackPoint* trackPoint) :
-    AbsMeasurement(rawHitCoords, rawHitCov, detId, hitId, trackPoint),
-    maxDistance_(2.0),
-    leftRight_(0) {
+HelixMeasurement::HelixMeasurement(const TVectorD &rawHitCoords,
+                                   const TMatrixDSym &rawHitCov, int detId,
+                                   int hitId, TrackPoint *trackPoint)
+    : AbsMeasurement(rawHitCoords, rawHitCov, detId, hitId, trackPoint) {
+  // 验证输入维度
+  if (rawHitCoords_.GetNrows() != 8) {
+    throw Exception("HelixMeasurement requires 8-dimensional rawHitCoords",
+                    __LINE__, __FILE__);
+  }
+}
 
-    if (rawHitCoords_.GetNrows() != 8) {
-        throw Exception("HelixMeasurement requires 7-dimensional rawHitCoords", __LINE__, __FILE__);
+SharedPlanePtr
+HelixMeasurement::constructPlane(const StateOnPlane &state) const {
+  // extrapolate to cylinder of radius r
+  const AbsTrackRep *rep = state.getRep();
+  StateOnPlane st(state);
+  rep->extrapolateToCylinder(st, rawHitCoords_(3));
+  TVector3 currentPos = rep->getPos(st);
+
+  // find closest point on helix
+  auto closest = findClosestPointOnHelix(currentPos);
+  const TVector3 &pocaOnHelix = closest.point;
+  TVector3 tangent = closest.tangent;
+  tangent.SetMag(1.0);
+
+  // get track direction at poca
+  TVector3 dirInPoca = rep->getMom(st);
+  dirInPoca.SetMag(1.0);
+
+  if (std::fabs(tangent.Angle(dirInPoca)) < 0.01) {
+    throw Exception("HelixMeasurement::constructPlane: Direction is parallel "
+                    "to helix tangent",
+                    __LINE__, __FILE__);
+  }
+
+  // construct plane
+  TVector3 U = dirInPoca.Cross(tangent);
+  if (U.Mag() < 1e-10) {
+    U = TVector3(1, 0, 0).Cross(tangent);
+    if (U.Mag() < 1e-10) {
+      U = TVector3(0, 1, 0).Cross(tangent);
     }
+  }
+  U.SetMag(1.0);
+  auto plane = new DetPlane(pocaOnHelix, U, tangent);
+
+  return SharedPlanePtr(plane);
 }
 
-SharedPlanePtr HelixMeasurement::constructPlane(const StateOnPlane& state) const {
-    // get state
-    const AbsTrackRep* rep = state.getRep();
-    TVector3 currentPos = rep->getPos(state);
-
-    // find closest point on helix
-    auto closest = findClosestPointOnHelix(currentPos);
-    const TVector3& pocaOnHelix = closest.point;
-    TVector3 tangent = closest.tangent;
-    tangent.SetMag(1.0);
-
-    // get track direction
-    TVector3 dirInPoca = rep->getMom(state);
-    dirInPoca.SetMag(1.0);
-
-    // check for parallelism
-    if (fabs(tangent.Angle(dirInPoca)) < 0.01) {
-        throw Exception(
-            "HelixMeasurement::constructPlane: Direction is parallel to helix tangent",
-            __LINE__, __FILE__);
-    }
-
-    // construct orthogonal vector
-    TVector3 U = dirInPoca.Cross(tangent);
-    U.SetMag(1.0);
-
-    // construct plane
-    return SharedPlanePtr(new DetPlane(pocaOnHelix, U, tangent));
+std::vector<MeasurementOnPlane *>
+HelixMeasurement::constructMeasurementsOnPlane(
+    const StateOnPlane &state) const {
+  double d{};
+  double V{rawHitCov_(7, 7)};
+  return {new MeasurementOnPlane(TVectorD(1, &d), TMatrixDSym(1, &V),
+                                 state.getPlane(), state.getRep(),
+                                 constructHMatrix(state.getRep()))};
 }
 
-std::vector<MeasurementOnPlane*> HelixMeasurement::constructMeasurementsOnPlane(
-    const StateOnPlane& state) const {
-    double mR = rawHitCoords_(8);
-    double mL = -mR;
-    double V = rawHitCov_(7, 7);
-
-    MeasurementOnPlane* mopL = new MeasurementOnPlane(
-        TVectorD(1, &mL),
-        TMatrixDSym(1, &V),
-        state.getPlane(),
-        state.getRep(),
-        constructHMatrix(state.getRep()));
-
-    MeasurementOnPlane* mopR = new MeasurementOnPlane(
-        TVectorD(1, &mR),
-        TMatrixDSym(1, &V),
-        state.getPlane(),
-        state.getRep(),
-        constructHMatrix(state.getRep()));
-
-    // set weights
-    if (leftRight_ < 0) {
-        mopL->setWeight(1);
-        mopR->setWeight(0);
-    } else if (leftRight_ > 0) {
-        mopL->setWeight(0);
-        mopR->setWeight(1);
-    } else {
-        double val = 0.5 * pow(std::max(0., 1 - mR / maxDistance_), 2.);
-        mopL->setWeight(val);
-        mopR->setWeight(val);
-    }
-
-    std::vector<MeasurementOnPlane*> retVal;
-    retVal.push_back(mopL);
-    retVal.push_back(mopR);
-    return retVal;
-}
-
-const AbsHMatrix* HelixMeasurement::constructHMatrix(const AbsTrackRep* rep) const {
-    if (dynamic_cast<const RKTrackRep*>(rep) == nullptr) {
-        throw Exception("HelixMeasurement can only handle state vectors of type RKTrackRep!",
-                        __LINE__, __FILE__);
-    }
-    return new HMatrixU();
-}
-
-void HelixMeasurement::setLeftRightResolution(int lr) {
-    if (lr == 0)
-        leftRight_ = 0;
-    else if (lr < 0)
-        leftRight_ = -1;
-    else
-        leftRight_ = 1;
+const AbsHMatrix *
+HelixMeasurement::constructHMatrix(const AbsTrackRep *rep) const {
+  if (dynamic_cast<const RKTrackRep *>(rep) == nullptr) {
+    throw Exception(
+        "HelixMeasurement can only handle state vectors of type RKTrackRep!",
+        __LINE__, __FILE__);
+  }
+  return new HMatrixU();
 }
 
 HelixMeasurement::ClosestPointResult
-HelixMeasurement::findClosestPointOnHelix(const TVector3& point) const {
-    ClosestPointResult result;
+HelixMeasurement::findClosestPointOnHelix(const TVector3 &point) const {
+  ClosestPointResult result;
 
-    // get helix parameters
-    const TVector3 center(rawHitCoords_(0), rawHitCoords_(1), rawHitCoords_(2));
-    const double radius = rawHitCoords_(3);
-    const double pitch = rawHitCoords_(4);
-    const double phi0 = rawHitCoords_(5);
-    const double phiTotal = rawHitCoords_(6);
-    double phi1 = (phi0 + phiTotal) / 2;
-    const TVector3 relPos = point - center;
-    const double k = pitch / (2 * TMath::Pi());
+  // get helix parameters
+  const TVector3 center(rawHitCoords_(0), rawHitCoords_(1), rawHitCoords_(2));
+  const double radius = rawHitCoords_(3);
+  const double pitchAngle = rawHitCoords_(4);
+  const double phi0 = rawHitCoords_(5);
+  const double phiTotal = rawHitCoords_(6);
 
-    // construct functions
-    auto distanceSq = [&](double phi) -> double {
-        const double deltaPhi = phi - phi1;
-        const double x = radius * std::cos(deltaPhi);
-        const double y = radius * std::sin(deltaPhi);
-        const double z = k * phi;
+  const auto cosA = std::cos(pitchAngle);
+  const auto sinA = std::sin(pitchAngle);
+  const auto tanA = sinA / cosA;
+  const auto tanAR = radius * tanA;
+  const auto zOffset = phiTotal / 2 * tanAR;
 
-        return (x - relPos.X()) * (x - relPos.X()) +
-               (y - relPos.Y()) * (y - relPos.Y()) +
-               (z - relPos.Z()) * (z - relPos.Z());
-    };
+  const TVector3 relPos = point - center;
 
-    auto derivative = [&](double phi) -> double {
-        const double deltaPhi = phi - phi1;
-        const double x = radius * std::cos(deltaPhi);
-        const double y = radius * std::sin(deltaPhi);
-        const double z = k * phi;
+  auto helixPoint = [&](double u) -> TVector3 {
+    const double rotatedU = u + phi0;
+    return TVector3(radius * std::cos(rotatedU), radius * std::sin(rotatedU),
+                    u * tanAR - zOffset);
+  };
 
-        const double dx_dphi = -radius * std::sin(deltaPhi);
-        const double dy_dphi = radius * std::cos(deltaPhi);
-        const double dz_dphi = k;
+  // 距离平方函数
+  auto distanceSq = [&](double u) -> double {
+    const TVector3 helixPt = helixPoint(u);
+    return (helixPt.X() - relPos.X()) * (helixPt.X() - relPos.X()) +
+           (helixPt.Y() - relPos.Y()) * (helixPt.Y() - relPos.Y()) +
+           (helixPt.Z() - relPos.Z()) * (helixPt.Z() - relPos.Z());
+  };
 
-        return 2 * (x - relPos.X()) * dx_dphi +
-               2 * (y - relPos.Y()) * dy_dphi +
-               2 * (z - relPos.Z()) * dz_dphi;
-    };
+  // 一阶导数函数
+  auto derivative = [&](double u) -> double {
+    const double u1 = u + phi0;
+    const TVector3 helixPt = helixPoint(u);
 
-    // second derivative
-    auto secondDerivative = [&](double phi) -> double {
-        const double deltaPhi = phi - phi1;
-        const double x = radius * std::cos(deltaPhi);
-        const double y = radius * std::sin(deltaPhi);
+    // 螺旋线导数分量
+    const double dx_du = -radius * std::sin(u1);
+    const double dy_du = radius * std::cos(u1);
+    const double dz_du = tanAR;
 
-        const double dx_dphi = -radius * std::sin(deltaPhi);
-        const double dy_dphi = radius * std::cos(deltaPhi);
+    return 2 * (helixPt.X() - relPos.X()) * dx_du +
+           2 * (helixPt.Y() - relPos.Y()) * dy_du +
+           2 * (helixPt.Z() - relPos.Z()) * dz_du;
+  };
 
-        const double d2x_dphi2 = -radius * std::cos(deltaPhi);
-        const double d2y_dphi2 = -radius * std::sin(deltaPhi);
+  // 二阶导数函数
+  auto secondDerivative = [&](double u) -> double {
+    const double u1 = u + phi0;
+    const TVector3 helixPt = helixPoint(u);
 
-        return 2 * (dx_dphi * dx_dphi + (x - relPos.X()) * d2x_dphi2) +
-               2 * (dy_dphi * dy_dphi + (y - relPos.Y()) * d2y_dphi2) +
-               2 * k * k;
-    };
+    // 螺旋线一阶导数分量
+    const double dx_du = -radius * std::sin(u1);
+    const double dy_du = radius * std::cos(u1);
+    const double dz_du = tanAR;
 
-    double bestPhi = 0.0;
-    double minDistSq = std::numeric_limits<double>::max();
-    const int numSamples = 100;
-    const double zGuess = (std::abs(k) > 1e-9) ? relPos.Z() / k : 0.0;
+    // 螺旋线二阶导数分量
+    const double d2x_du2 = -radius * std::cos(u1);
+    const double d2y_du2 = -radius * std::sin(u1);
+    const double d2z_du2 = 0;
 
-    // find good starting point
-    const double startPhi = phi0;
-    const double endPhi = phi0 + phiTotal;
+    return 2 * (dx_du * dx_du + (helixPt.X() - relPos.X()) * d2x_du2) +
+           2 * (dy_du * dy_du + (helixPt.Y() - relPos.Y()) * d2y_du2) +
+           2 * (dz_du * dz_du + (helixPt.Z() - relPos.Z()) * d2z_du2);
+  };
 
-    for (int i = 0; i <= numSamples; ++i) {
-        const double phi = startPhi + i * (endPhi - startPhi) / numSamples;
-        const double distSq = distanceSq(phi);
-        if (distSq < minDistSq) {
-            minDistSq = distSq;
-            bestPhi = phi;
-        }
+  double bestU = 0.0;
+  double minDistSq = std::numeric_limits<double>::max();
+  const int numSamples = 100;
+  const double startU = 0;
+  const double endU = phiTotal;
+
+  for (int i = 0; i <= numSamples; ++i) {
+    const double u = startU + i * (endU - startU) / numSamples;
+    const double distSq = distanceSq(u);
+    if (distSq < minDistSq) {
+      minDistSq = distSq;
+      bestU = u;
     }
+  }
 
-    // refine using Newton's method
-    constexpr int maxIterations = 50;
-    constexpr double tolerance = 1e-10;
-    double phi = bestPhi;
+  constexpr int maxIterations = 50;
+  constexpr double tolerance = 1e-10;
+  double u = bestU;
 
-    for (int i = 0; i < maxIterations; ++i) {
-        const double d1 = derivative(phi);
-        const double d2 = secondDerivative(phi);
+  for (int i = 0; i < maxIterations; ++i) {
+    const double d1 = derivative(u);
+    const double d2 = secondDerivative(u);
 
-        if (std::abs(d2) < 1e-15) break;
+    if (std::abs(d2) < 1e-15)
+      break;
 
-        const double delta = -d1 / d2;
-        phi += delta;
+    const double delta = -d1 / d2;
+    u += delta;
 
-        if (std::abs(delta) < tolerance) break;
-    }
+    if (std::abs(delta) < tolerance)
+      break;
+  }
 
-    const double deltaPhi = phi - phi1;
-    const double normalizedPhi = deltaPhi - 2 * TMath::Pi() * std::floor(deltaPhi / (2 * TMath::Pi()));
+  const TVector3 closestPoint = helixPoint(u);
+  result.point = center + closestPoint;
 
-    result.point.SetXYZ(
-        center.X() + radius * std::cos(normalizedPhi),
-        center.Y() + radius * std::sin(normalizedPhi),
-        center.Z() + k * phi);
+  const double u1 = u + phi0;
+  result.tangent.SetXYZ(-radius * std::sin(u1), radius * std::cos(u1), tanAR);
 
-    result.tangent.SetXYZ(
-        -radius * std::sin(normalizedPhi),
-        radius * std::cos(normalizedPhi),
-        k);
+  result.tangent = result.tangent.Unit();
 
-    // unitize tangent
-    result.tangent = result.tangent.Unit();
-
-    return result;
+  return result;
 }
 
 } // namespace genfit

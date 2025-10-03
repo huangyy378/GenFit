@@ -28,59 +28,52 @@
 
 namespace genfit {
 
-/** @brief Class for measurements in helical detectors (like helical trackers or detectors)
- *  which measure the drift distance from a helical wire.
+/** @brief Class for measurements in helical detectors (like helical trackers or
+ * detectors) which measure the drift distance from a helical wire.
  *
  * This hit class is designed for helical-shaped detectors where measurements
- * are the drift distance from a helical wire. The hit is described by 7 coordinates:
- * h_x, h_y, h_z, radius, pitch, phi0, rdrift
- * where:
+ * are the drift distance from a helical wire. The hit is described by 7
+ * coordinates: h_x, h_y, h_z, radius, pitch, phi0, rdrift where:
  * - h_x, h_y, h_z: center coordinates of the helix
  * - radius: radius of the helix
  * - pitch: pitch length (z-distance per full turn)
  * - phi0: initial phase angle (in radians)
  * - rdrift: drift distance from the helix wire
  *
- * The measurement plane is dynamically constructed at the point of closest approach
- * to the helix, with the V-axis tangent to the helix and the U-axis perpendicular.
+ * The measurement plane is dynamically constructed at the point of closest
+ * approach to the helix, with the V-axis tangent to the helix and the U-axis
+ * perpendicular.
  */
 class HelixMeasurement : public AbsMeasurement {
 
 public:
-    HelixMeasurement(int nDim = 8);
-    HelixMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov,
-                     int detId, int hitId, TrackPoint* trackPoint);
+  HelixMeasurement(int nDim = 8);
+  HelixMeasurement(const TVectorD &rawHitCoords, const TMatrixDSym &rawHitCov,
+                   int detId, int hitId, TrackPoint *trackPoint);
 
-    virtual ~HelixMeasurement() { ; }
+  virtual ~HelixMeasurement() { ; }
 
-    virtual AbsMeasurement* clone() const override { return new HelixMeasurement(*this); }
+  virtual AbsMeasurement *clone() const override {
+    return new HelixMeasurement(*this);
+  }
 
-    virtual SharedPlanePtr constructPlane(const StateOnPlane& state) const override;
+  virtual SharedPlanePtr
+  constructPlane(const StateOnPlane &state) const override;
 
-    virtual std::vector<MeasurementOnPlane*> constructMeasurementsOnPlane(const StateOnPlane& state) const override;
+  virtual std::vector<MeasurementOnPlane *>
+  constructMeasurementsOnPlane(const StateOnPlane &state) const override;
 
-    virtual const AbsHMatrix* constructHMatrix(const AbsTrackRep*) const override;
+  virtual const AbsHMatrix *
+  constructHMatrix(const AbsTrackRep *) const override;
 
-    void setMaxDistance(double d) { maxDistance_ = d; }
-
-    void setLeftRightResolution(int lr);
-
-    virtual bool isLeftRightMeasurement() const override { return true; }
-    virtual int getLeftRightResolution() const override { return leftRight_; }
-
-    double getMaxDistance() { return maxDistance_; }
-
-protected:
-    double maxDistance_;
-    signed char leftRight_;
-    struct ClosestPointResult {
-        TVector3 point;   // closest point on the helix to the given point
-        TVector3 tangent; // tangent of the helix at the closest point
-    };
-    ClosestPointResult findClosestPointOnHelix(const TVector3& point) const;
+  struct ClosestPointResult {
+    TVector3 point;   // closest point on helix
+    TVector3 tangent; // tangent at that point
+  };
+  ClosestPointResult findClosestPointOnHelix(const TVector3 &point) const;
 
 public:
-    ClassDefOverride(HelixMeasurement, 1);
+  ClassDefOverride(HelixMeasurement, 1);
 };
 
 } /* End of namespace genfit */
